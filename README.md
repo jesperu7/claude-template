@@ -12,9 +12,6 @@ CLAUDE.md                       # Always-on quick reference (FILL IN per project
 .claude/
 ├── SETUP.md                    # How the whole setup works (read this first)
 ├── settings.local.json         # Registers the SessionStart hook (use as-is)
-├── commands/
-│   ├── code-review.md          # Review pipeline (tailor analyze step to your stack)
-│   └── read.md                 # Refresh full context (use as-is)
 ├── hooks/
 │   └── validate-claude-setup.sh# Drift detector (use as-is)
 ├── rules/
@@ -44,7 +41,6 @@ docs/claude/
 - `.claude/rules/approach.md`
 - `.claude/hooks/validate-claude-setup.sh`
 - `.claude/skills/check-rules/SKILL.md`
-- `.claude/commands/read.md`
 - `.claude/settings.local.json`
 - The folder structure and layering itself
 
