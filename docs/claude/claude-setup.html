@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Setup — Apps Team Template</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-2: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --text-faint: #6e7681;
+    --always: #2dd4bf;   /* every session */
+    --open:   #60a5fa;   /* on matching file open */
+    --demand: #c084fc;   /* read on demand */
+    --invoke: #f0883e;   /* user types /name */
+    --guard:  #d29922;   /* session-start hook */
+    --high: #f85149;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5; padding: 0 0 80px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  header {
+    text-align: center; padding: 48px 24px 24px;
+    border-bottom: 1px solid var(--border); margin-bottom: 8px;
+    background: radial-gradient(ellipse at top, rgba(45,212,191,0.08), transparent 70%);
+  }
+  header h1 { font-size: 2rem; margin: 0 0 8px; font-weight: 700; letter-spacing: -0.5px; }
+  header h1 code {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 2px 12px; color: var(--always); font-size: 1.6rem;
+  }
+  header p { color: var(--text-dim); margin: 4px 0; max-width: 760px; margin-inline: auto; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; align-items: center;
+    margin: 24px auto 8px; padding: 14px 20px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 12px; max-width: fit-content;
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--text-dim); }
+  .swatch { width: 13px; height: 13px; border-radius: 4px; flex-shrink: 0; }
+  .sw-always { background: var(--always); } .sw-open { background: var(--open); }
+  .sw-demand { background: var(--demand); } .sw-invoke { background: var(--invoke); }
+  .sw-guard { background: var(--guard); }
+
+  .band {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 20px 20px; margin-bottom: 16px;
+  }
+  .band-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .layer-no {
+    font-weight: 700; font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-faint); background: var(--bg); border: 1px solid var(--border);
+    border-radius: 999px; padding: 3px 11px;
+  }
+  .band-title { font-size: 1.15rem; font-weight: 650; margin: 0; }
+  .band-sub { color: var(--text-dim); font-size: 0.85rem; margin: 0; flex-basis: 100%; }
+  .trigger {
+    margin-left: auto; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;
+    border-radius: 999px; padding: 2px 10px; font-weight: 700; border: 1px solid var(--border);
+  }
+  .t-always { color: var(--always); background: rgba(45,212,191,0.12); }
+  .t-open   { color: var(--open);   background: rgba(96,165,250,0.12); }
+  .t-demand { color: var(--demand); background: rgba(192,132,252,0.12); }
+  .t-invoke { color: var(--invoke); background: rgba(240,136,62,0.12); }
+  .t-guard  { color: var(--guard);  background: rgba(210,153,34,0.12); }
+
+  .sub-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-faint); margin: 14px 0 8px; }
+
+  .cards { display: grid; gap: 12px; }
+  .cards.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cards.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    background: var(--bg-card-2); border: 1px solid var(--border); border-left-width: 4px;
+    border-radius: 10px; padding: 12px 14px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .card h4 { margin: 0 0 5px; font-size: 0.92rem; font-weight: 620; }
+  .card h4 code { font-size: 0.86em; color: var(--text); }
+  .card p { margin: 3px 0 0; color: var(--text-dim); font-size: 0.81rem; }
+  .card ul { margin: 5px 0 0; padding-left: 16px; color: var(--text-dim); font-size: 0.81rem; }
+  .card ul li { margin-bottom: 3px; }
+  .card code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 0.78em; color: var(--text); }
+  .card .load { display:inline-block; font-size:0.62rem; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; padding:1px 7px; border-radius:5px; margin-bottom:7px; }
+
+  .always { border-left-color: var(--always); } .always .load { background: rgba(45,212,191,0.15); color: var(--always); }
+  .open   { border-left-color: var(--open);   } .open .load   { background: rgba(96,165,250,0.15); color: var(--open); }
+  .demand { border-left-color: var(--demand); } .demand .load { background: rgba(192,132,252,0.15); color: var(--demand); }
+  .invoke { border-left-color: var(--invoke); } .invoke .load { background: rgba(240,136,62,0.15); color: var(--invoke); }
+  .guard  { border-left-color: var(--guard);  } .guard .load  { background: rgba(210,153,34,0.15); color: var(--guard); }
+
+  /* context table */
+  .ctx-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  .ctx-table th, .ctx-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .ctx-table th { color: var(--text-faint); font-weight: 600; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.5px; }
+  .ctx-table td { color: var(--text-dim); }
+  .ctx-table td:first-child { color: var(--text); white-space: nowrap; }
+  .pill { display:inline-flex; align-items:center; gap:6px; }
+  .pill .swatch { width: 10px; height: 10px; }
+  .yes { color: #3fb950; } .no { color: var(--text-faint); }
+
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+  .note { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .note h3 { margin: 0 0 10px; font-size: 0.95rem; }
+  .note ul { margin: 0; padding-left: 18px; color: var(--text-dim); font-size: 0.82rem; }
+  .note ul li { margin-bottom: 5px; }
+  .note code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 0.78em; }
+  .footer-meta { text-align: center; color: var(--text-faint); font-size: 0.78rem; margin-top: 28px; }
+
+  .tip { background: rgba(45,212,191,0.07); border: 1px solid rgba(45,212,191,0.25); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; color: var(--text-dim); font-size: 0.85rem; }
+  .tip b { color: var(--always); }
+
+  @media (max-width: 820px) {
+    .cards.cols-3, .cards.cols-2 { grid-template-columns: 1fr; }
+    .notes { grid-template-columns: 1fr; }
+    .ctx-table { font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Claude Setup · <code>Apps Template</code></h1>
+  <p>How <code>CLAUDE.md</code>, the rules, the guides, the hook, and the commands fit together — the shared Apps team layout.</p>
+  <p style="font-size:0.82rem;color:var(--text-faint)">Same structure in every project so skills, commands, hooks and rules are shareable. Colour = <i>when it enters context</i>.</p>
+  <div class="legend">
+    <div class="item"><span class="swatch sw-always"></span> Always (every session)</div>
+    <div class="item"><span class="swatch sw-open"></span> On matching file open</div>
+    <div class="item"><span class="swatch sw-demand"></span> Read on demand</div>
+    <div class="item"><span class="swatch sw-invoke"></span> On <code>/invoke</code></div>
+    <div class="item"><span class="swatch sw-guard"></span> Session-start guard</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="tip">
+    <b>This is the template companion.</b> It describes the structure every project shares. Anything in
+    <code>&lt;…&gt;</code> is a placeholder — once a project is filled in, swap the title above for the project name
+    and the architecture-specific cards for that project's real layers.
+  </div>
+
+  <!-- CONTEXT MAP -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Map</span>
+      <h2 class="band-title">What loads when</h2>
+      <p class="band-sub">The whole model in one table. Eager at the top, lazy at the bottom.</p>
+    </div>
+    <table class="ctx-table">
+      <thead><tr><th>Source</th><th>Enters context</th><th>Survives <code>/compact</code></th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill"><span class="swatch sw-always"></span><code>CLAUDE.md</code></span></td><td>Every session, in full</td><td class="yes">✓ re-injected</td></tr>
+        <tr><td><span class="pill"><span class="swatch sw-always"></span>Unconditional rules</span></td><td>Every session (no <code>paths:</code>)</td><td class="yes">✓ re-injected</td></tr>
+        <tr><td><span class="pill"><span class="swatch sw-open"></span>Path-scoped rules</span></td><td>When you open a matching file</td><td class="no">✗ reloads on next match</td></tr>
+        <tr><td><span class="pill"><span class="swatch sw-demand"></span><code>docs/claude/</code> guides</span></td><td>Only when Claude reads them</td><td class="no">✗</td></tr>
+        <tr><td><span class="pill"><span class="swatch sw-always"></span>Auto-memory index</span></td><td>Every session (first part)</td><td class="yes">✓</td></tr>
+        <tr><td><span class="pill"><span class="swatch sw-demand"></span>Auto-memory topics</span></td><td>On demand</td><td class="no">✗</td></tr>
+        <tr><td><span class="pill"><span class="swatch sw-invoke"></span>Commands / skills</span></td><td>When you type <code>/name</code></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- LAYER 1 -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Layer 1</span>
+      <h2 class="band-title"><code>CLAUDE.md</code> — the always-on quick reference</h2>
+      <span class="trigger t-always">Always</span>
+      <p class="band-sub">Loaded in full every session and re-injected after <code>/compact</code>. Holds only what must apply on every turn. Keep it lean — everything here costs context every session.</p>
+    </div>
+    <div class="cards cols-2">
+      <div class="card always">
+        <span class="load">Always</span>
+        <h4>Non-negotiables &amp; workflow</h4>
+        <ul>
+          <li><b>ZERO TOLERANCE</b>: the most critical rules inline + pointer to the full list in <code>zero-tolerance.md</code></li>
+          <li>Mandatory workflow: grep examples → verify vs rules → implement → analyze/format</li>
+        </ul>
+      </div>
+      <div class="card always">
+        <span class="load">Always</span>
+        <h4>Quick reference</h4>
+        <ul>
+          <li>Quick commands, pre-commit checks, code patterns, architecture, per-artifact checklists</li>
+          <li>A <code>DETAILED GUIDES</code> index pointing at the <code>docs/claude/</code> deep-dives</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYER 2 -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Layer 2</span>
+      <h2 class="band-title"><code>.claude/rules/</code> — topic-scoped rules</h2>
+      <p class="band-sub">The frontmatter key decides loading: <b>no frontmatter → unconditional</b> (always-on); <b><code>paths:</code> list → scoped</b> (loads only when you open a matching file). The key must be <code>paths:</code>, not <code>globs:</code>.</p>
+    </div>
+
+    <div class="sub-label">Unconditional — always-on</div>
+    <div class="cards cols-3">
+      <div class="card always"><span class="load">Always</span><h4><code>zero-tolerance.md</code></h4><p>The full enforced non-negotiable list (canonical source)</p></div>
+      <div class="card always"><span class="load">Always</span><h4><code>code-style-rules.md</code></h4><p>Naming, file organization, imports, formatting</p></div>
+      <div class="card always"><span class="load">Always</span><h4><code>error-handling-rules.md</code></h4><p>Result/error type, exceptions, error flow</p></div>
+      <div class="card always"><span class="load">Always</span><h4><code>legacy-forbidden.md</code></h4><p>Areas Claude must never touch or copy from</p></div>
+      <div class="card always"><span class="load">Always</span><h4><code>approach.md</code></h4><p>Research-first, direct tools, minimal &amp; correct, no filler <i>(ships ready)</i></p></div>
+    </div>
+
+    <div class="sub-label">Path-scoped — load only in matching dirs <span style="text-transform:none;color:var(--text-faint)">(adjust globs &amp; extension to your project)</span></div>
+    <div class="cards cols-2">
+      <div class="card open"><span class="load">On open</span><h4><code>viewmodel-rules.md</code></h4><p><code>**/view_models/**</code> · <code>**/view_model/**</code></p></div>
+      <div class="card open"><span class="load">On open</span><h4><code>service-rules.md</code></h4><p><code>**/services/**</code> · <code>**/service/**</code></p></div>
+      <div class="card open"><span class="load">On open</span><h4><code>repository-rules.md</code></h4><p><code>**/repositories/**</code> · <code>**/repository/**</code></p></div>
+      <div class="card open"><span class="load">On open</span><h4><code>route-rules.md</code></h4><p><code>**/routes/**</code> · <code>**/route/**</code></p></div>
+      <div class="card open"><span class="load">On open</span><h4><code>ui-rules.md</code></h4><p><code>**/ui/**</code></p></div>
+      <div class="card open"><span class="load">On open</span><h4><code>test-rules.md</code></h4><p><code>**/test/**</code> · <code>**/tests/**</code></p></div>
+    </div>
+    <p class="band-sub" style="margin-top:12px">Cover singular <i>and</i> plural directory names if the codebase mixes both — globs match path segments literally. Rename these to match the project's real layers if the architecture differs.</p>
+  </section>
+
+  <!-- LAYER 3 -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Layer 3</span>
+      <h2 class="band-title"><code>docs/claude/</code> — deep-dive guides</h2>
+      <span class="trigger t-demand">On demand</span>
+      <p class="band-sub">Long-form "how/why" docs. Not auto-loaded; Claude reads the relevant one when needed. <code>CLAUDE.md</code>'s <code>DETAILED GUIDES</code> index points at them. Keep the ones you need, delete the rest.</p>
+    </div>
+    <div class="cards cols-2">
+      <div class="card demand">
+        <span class="load">On demand</span>
+        <h4>Indexed guides</h4>
+        <p><code>architecture</code> · <code>state-management</code> · <code>testing</code> · <code>code-style</code> · <code>common-violations</code> <i>(starter set — add or remove to fit the project)</i></p>
+      </div>
+      <div class="card demand">
+        <span class="load">On demand</span>
+        <h4><code>README.md</code></h4>
+        <p>The human-facing index of the guides. Every guide listed here should also appear in <code>CLAUDE.md</code>'s index, or the hook flags it as an orphan.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTO-MEMORY -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Memory</span>
+      <h2 class="band-title">Auto-memory — notes Claude writes itself</h2>
+      <p class="band-sub">Lives at <code>~/.claude/projects/&lt;project&gt;/memory/</code> — <b>machine-local, per-user, NOT in the repo</b> and not shared between developers.</p>
+    </div>
+    <div class="cards cols-2">
+      <div class="card always"><span class="load">Always</span><h4><code>MEMORY.md</code> index</h4><p>The index loads every session. Keep it terse.</p></div>
+      <div class="card demand"><span class="load">On demand</span><h4>Topic files</h4><p>Detailed notes loaded only when Claude needs them.</p></div>
+    </div>
+  </section>
+
+  <!-- HOOK -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Guard</span>
+      <h2 class="band-title">The hook — drift detection</h2>
+      <span class="trigger t-guard">Session start</span>
+      <p class="band-sub"><code>.claude/hooks/validate-claude-setup.sh</code>, registered as a <code>SessionStart</code> hook in <code>settings.local.json</code>. Runs once per session, warns via a <code>systemMessage</code> — non-blocking, silent when healthy. <i>(Ships ready.)</i></p>
+    </div>
+    <div class="cards cols-3">
+      <div class="card guard"><span class="load">Warns</span><h4>Dead glob</h4><p>A rule <code>paths:</code> glob matching zero files (folder renamed/moved → rule never loads)</p></div>
+      <div class="card guard"><span class="load">Warns</span><h4>Stale <code>globs:</code> key</h4><p>A rule using the unsupported Cursor key instead of <code>paths:</code></p></div>
+      <div class="card guard"><span class="load">Warns</span><h4>Missing guide</h4><p>A guide in the <code>DETAILED GUIDES</code> index that's absent from <code>docs/claude/</code></p></div>
+    </div>
+  </section>
+
+  <!-- SKILLS & COMMANDS -->
+  <section class="band">
+    <div class="band-head">
+      <span class="layer-no">Run</span>
+      <h2 class="band-title">Skills &amp; commands</h2>
+      <span class="trigger t-invoke">On /invoke</span>
+      <p class="band-sub">You trigger these by typing <code>/name</code>. They run in the <b>main conversation</b> (unlike subagents, which the orchestrator delegates to and which can't be user-invoked or nested).</p>
+    </div>
+    <div class="cards cols-3">
+      <div class="card invoke">
+        <span class="load">/command</span>
+        <h4><code>/code-review [base]</code></h4>
+        <p>Review pipeline. Applies unconditional + matching path-scoped rules; runs the validator as a non-blocking <b>Setup Warnings</b> pre-check. Tailor the analyze step to the stack; teams with budget can fan out to parallel reviewers.</p>
+      </div>
+      <div class="card invoke">
+        <span class="load">/skill</span>
+        <h4><code>/check-rules</code></h4>
+        <p>On-demand run of <code>validate-claude-setup.sh</code> with a readable report. Explicit-only (<code>disable-model-invocation</code>). <i>(Ships ready.)</i></p>
+      </div>
+      <div class="card invoke">
+        <span class="load">/command</span>
+        <h4><code>/read</code></h4>
+        <p>Reads all instruction + documentation <code>.md</code> to refresh full context. <i>(Ships ready.)</i></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <div class="notes">
+    <div class="note">
+      <h3>What survives <code>/compact</code></h3>
+      <ul>
+        <li><b>Re-injected:</b> <code>CLAUDE.md</code>, unconditional rules, auto-memory index</li>
+        <li><b>Not re-injected:</b> path-scoped rules &amp; nested CLAUDE.md (reload on next matching file read), guides, memory topic files</li>
+        <li>This is why the full ZERO-TOLERANCE list lives in the unconditional <code>zero-tolerance.md</code> — it survives compaction</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>Maintenance &amp; gotchas</h3>
+      <ul>
+        <li><b>New rule:</b> universal → no frontmatter; area-specific → <code>paths:</code> YAML list (cover singular <i>and</i> plural dir names)</li>
+        <li><b>Renaming a folder</b> can silently orphan a rule glob — the hook / <code>/check-rules</code> will warn</li>
+        <li><b>New guide:</b> add it to <code>CLAUDE.md</code>'s <code>DETAILED GUIDES</code> index or it shows as an orphan</li>
+        <li><b>Verify anytime:</b> <code>/check-rules</code> or <code>bash .claude/hooks/validate-claude-setup.sh</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="footer-meta">Companion to <code>.claude/SETUP.md</code> · open in any browser</p>
+
+</div>
+</body>
+</html>
